@@ -34,8 +34,6 @@ double inline randomDouble()
    return ((next << 27) + next2) / (double)(1LL << 53);
 }
 
-// Structure representing planet data using structure of arrays (SoA)
-// Using alignas(64) to ensure the structure itself is 64-byte aligned.
 typedef struct alignas(64)
 {
    double *mass;
@@ -49,7 +47,6 @@ typedef struct alignas(64)
 int nplanets;
 int timesteps;
 double dt;
-double G; // Gravity constant (defined but not used in the force calculation)
 
 // Global pointers for the double-buffered structures.
 PlanetStruct *planets;
@@ -63,8 +60,6 @@ void initPlanetStruct(PlanetStruct *planet, int nplanets)
    planet->y = (double *)malloc(sizeof(double) * nplanets);
    planet->vx = (double *)malloc(sizeof(double) * nplanets);
    planet->vy = (double *)malloc(sizeof(double) * nplanets);
-   // For optimal performance with aligned load intrinsics, you can replace
-   // malloc with an aligned allocation (e.g., posix_memalign or _mm_malloc).
 }
 
 // Function to free memory allocated for a PlanetStruct instance.
@@ -77,8 +72,6 @@ void freePlanetStruct(PlanetStruct *planet)
    free(planet->vy);
 }
 
-// Helper function to swap the arrays inside the global PlanetStructs.
-// This swaps the pointers for mass, x, y, vx, and vy between planets and buffer.
 void swapBuffers()
 {
    double *temp;
@@ -156,22 +149,6 @@ void simulate()
          vx_sum = temp[0] + temp[1] + temp[2] + temp[3];
          _mm256_storeu_pd(temp, vy_accum);
          vy_sum = temp[0] + temp[1] + temp[2] + temp[3];
-
-         // Handle any leftover iterations when nplanets is not a multiple of 4.
-         for (; j < nplanets; j++)
-         {
-            double dx = planets->x[j] - planets->x[i];
-            double dy = planets->y[j] - planets->y[i];
-            double distSqr = dx * dx + dy * dy + 0.0001;
-            double invDist = (planets->mass[i] * planets->mass[j]) / sqrt(distSqr);
-            double invDist3 = invDist * invDist * invDist;
-            vx_sum += dt * dx * invDist3;
-            vy_sum += dt * dy * invDist3;
-         }
-         buffer->vx[i] += vx_sum;
-         buffer->vy[i] += vy_sum;
-         buffer->x[i] += dt * buffer->vx[i];
-         buffer->y[i] += dt * buffer->vy[i];
       }
 
       // Swap the data in the global structures by swapping all array pointers.
@@ -188,6 +165,13 @@ int main(int argc, const char **argv)
       return 1;
    }
    nplanets = atoi(argv[1]);
+
+   if (nplanets % 4 != 0)
+   {
+      printf("nplanets must be a multiple of 4\n");
+      return 1;
+   }
+
    timesteps = atoi(argv[2]);
    dt = 0.001;
 
