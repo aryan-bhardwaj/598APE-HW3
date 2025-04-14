@@ -47,7 +47,7 @@ double G;
 // The new state is computed from 'current' and stored in 'next'.
 void step(struct Planet* current, struct Planet* next) {
    // Copy the current state into the next buffer.
-   #pragma omp parallel for
+   #pragma omp parallel for if (nplanets > 50)
    for (int i = 0; i < nplanets; i++) {
       next[i].mass = current[i].mass;
       next[i].x = current[i].x;
@@ -57,7 +57,7 @@ void step(struct Planet* current, struct Planet* next) {
    }
 
    // Update velocities based on the gravitational-like interactions.
-   #pragma omp parallel for
+   #pragma omp parallel for if (nplanets > 50)
    for (int i = 0; i < nplanets; i++) {
       for (int j = 0; j < nplanets; j++) {
          double dx = current[j].x - current[i].x;
