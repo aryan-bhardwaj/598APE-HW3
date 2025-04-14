@@ -98,7 +98,7 @@ void simulate()
    for (int t = 0; t < timesteps; t++)
    {
       // Copy the current state from planets to buffer.
-      #pragma omp parallel for
+      #pragma omp parallel for if (nplanets > 50)
       for (int i = 0; i < nplanets; i++)
       {
          buffer->mass[i] = planets->mass[i];
@@ -108,9 +108,7 @@ void simulate()
          buffer->vy[i] = planets->vy[i];
       }
 
-      // Update velocities and positions based on gravitational-like interactions.
-      // Uses AVX2 intrinsics to vectorize the inner loop computations.
-      #pragma omp parallel for
+      #pragma omp parallel for if (nplanets > 50)
       for (int i = 0; i < nplanets; i++)
       {
          __m256d vx_accum = _mm256_setzero_pd();
@@ -149,6 +147,11 @@ void simulate()
          vx_sum = temp[0] + temp[1] + temp[2] + temp[3];
          _mm256_storeu_pd(temp, vy_accum);
          vy_sum = temp[0] + temp[1] + temp[2] + temp[3];
+
+         buffer->vx[i] += vx_sum;
+         buffer->vy[i] += vy_sum;
+         buffer->x[i] += dt * buffer->vx[i];
+         buffer->y[i] += dt * buffer->vy[i];
       }
 
       // Swap the data in the global structures by swapping all array pointers.
@@ -165,7 +168,6 @@ int main(int argc, const char **argv)
       return 1;
    }
    nplanets = atoi(argv[1]);
-
    if (nplanets % 4 != 0)
    {
       printf("nplanets must be a multiple of 4\n");
