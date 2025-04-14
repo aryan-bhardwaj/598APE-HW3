@@ -21,7 +21,7 @@ struct Planet {
 // unsigned long long seed = 100;
 
 // Generate a 64-bit random number using bitwise operations.
-unsigned long long randomU64(unsigned long long *seed) {
+unsigned inline long long randomU64(unsigned long long *seed) {
    *seed ^= (*seed << 21);
    *seed ^= (*seed >> 35);
    *seed ^= (*seed << 4);
@@ -29,7 +29,7 @@ unsigned long long randomU64(unsigned long long *seed) {
 }
 
 // Produce a random double in the range [0, 1].
-double randomDouble(unsigned long long *seed) {
+double inline randomDouble(unsigned long long *seed) {
    unsigned long long next = randomU64(seed);
    next >>= (64 - 26);
    unsigned long long next2 = randomU64(seed);
