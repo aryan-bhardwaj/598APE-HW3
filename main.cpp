@@ -18,21 +18,21 @@ struct Planet {
 };
 
 // Global seed for the random number generator.
-// unsigned long long seed = 100;
+unsigned long long seed = 100;
 
 // Generate a 64-bit random number using bitwise operations.
-unsigned inline long long randomU64(unsigned long long *seed) {
-   *seed ^= (*seed << 21);
-   *seed ^= (*seed >> 35);
-   *seed ^= (*seed << 4);
-   return *seed;
+unsigned inline long long randomU64() {
+   seed ^= (seed << 21);
+   seed ^= (seed >> 35);
+   seed ^= (seed << 4);
+   return seed;
 }
 
 // Produce a random double in the range [0, 1].
-double inline randomDouble(unsigned long long *seed) {
-   unsigned long long next = randomU64(seed);
+double inline randomDouble() {
+   unsigned long long next = randomU64();
    next >>= (64 - 26);
-   unsigned long long next2 = randomU64(seed);
+   unsigned long long next2 = randomU64();
    next2 >>= (64 - 26);
    return ((next << 27) + next2) / (double)(1LL << 53);
 }
@@ -90,14 +90,12 @@ int main(int argc, const char** argv) {
    struct Planet* buffer  = (struct Planet*)malloc(sizeof(struct Planet) * nplanets);
 
    // Initialize planet values.
-   #pragma omp parallel for
    for (int i = 0; i < nplanets; i++) {
-      unsigned long long local_seed = 100;
-      planets[i].mass = randomDouble(&local_seed) * 10 + 0.2;
-      planets[i].x = (randomDouble(&local_seed) - 0.5) * 100 * pow(1 + nplanets, 0.4);
-      planets[i].y = (randomDouble(&local_seed) - 0.5) * 100 * pow(1 + nplanets, 0.4);
-      planets[i].vx = randomDouble(&local_seed) * 5 - 2.5;
-      planets[i].vy = randomDouble(&local_seed) * 5 - 2.5;
+      planets[i].mass = randomDouble() * 10 + 0.2;
+      planets[i].x = (randomDouble() - 0.5) * 100 * pow(1 + nplanets, 0.4);
+      planets[i].y = (randomDouble() - 0.5) * 100 * pow(1 + nplanets, 0.4);
+      planets[i].vx = randomDouble() * 5 - 2.5;
+      planets[i].vy = randomDouble() * 5 - 2.5;
    }
 
    struct timeval start, end;
