@@ -36,25 +36,19 @@ In order to run the artifact, first run `git checkout test`. Then, you will have
 - c1b54ba2a261fadf3c8a79644e9b0814d618ee37 (replaced AoS with SoA, used alignas(64) for struct, and added vectorization)
 
 Here are the test cases showed in the report. 
+Test Case 1: 1000 planets, 5000 timesteps
 ```bash
 ./main.exe 1000 5000
 ```
-
+Test Case 2a: 8 planets, 1000000 timesteps
 ```bash
 ./main.exe 8 1000000
 ```
-
+Test Case 2b: 8 planets, 10000000 timesteps
 ```bash
 ./main.exe 8 10000000
 ```
-
+Test Case 2c: 8 planets, 100000000 timesteps
 ```bash
 ./main.exe 8 100000000
 ```
-
-In particular, consider speeding up simple run like the following (which runs ~6 seconds on my local laptop under the default setup):
-```bash
-./main.exe 1000 5000
-```
-
-Exact bitwise reproducibility is not required, but approximate correctness (within a reasonable region of the final location).
