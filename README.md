@@ -35,6 +35,23 @@ In order to run the artifact, first run `git checkout test`. Then, you will have
 - 98710c0e45ed097443164ac0e8c982ac93547c10 (added inlining to random number functions)
 - c1b54ba2a261fadf3c8a79644e9b0814d618ee37 (replaced AoS with SoA, used alignas(64) for struct, and added vectorization)
 
+Here are the test cases showed in the report. 
+```bash
+./main.exe 1000 5000
+```
+
+```bash
+./main.exe 8 1000000
+```
+
+```bash
+./main.exe 8 10000000
+```
+
+```bash
+./main.exe 8 100000000
+```
+
 In particular, consider speeding up simple run like the following (which runs ~6 seconds on my local laptop under the default setup):
 ```bash
 ./main.exe 1000 5000
