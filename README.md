@@ -28,6 +28,12 @@ Once compiled, one can call the nbody program as follows, where nplanets is the 
 ```bash
 ./main.exe <nplanets> <timesteps>
 ```
+In order to run the artifact, first run `git checkout test`. Then, you will have to checkout specific commit hashes to test specific optimizations. Here are the commit hashes of the major commits to reproduce my results. 
+- dd69847231ebcf997fa41c037256b68f1750ced5 (added compiler flags)
+- f9ec6cf5c8472c0690ca2a09d8d86a68811ea0ec (added double buffering)
+- 1de2ee27d80b19c3ce075e464c641ce23740a2a7 (added OpenMP parallelization)
+- 98710c0e45ed097443164ac0e8c982ac93547c10 (added inlining to random number functions)
+- c1b54ba2a261fadf3c8a79644e9b0814d618ee37 (replaced AoS with SoA, used alignas(64) for struct, and added vectorization)
 
 In particular, consider speeding up simple run like the following (which runs ~6 seconds on my local laptop under the default setup):
 ```bash
